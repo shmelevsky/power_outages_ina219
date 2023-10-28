@@ -1,0 +1,10 @@
+[Unit]
+Description=Power Telegram Reporter
+
+[Service]
+Type=simple
+ExecStart=/root/power_outages_ina219/venv/bin/python3 /root/power_outages_ina219/power_tele_reporter.py
+EnvironmentFile=/root/power_outages_ina219/env.txt
+
+[Install]
+WantedBy=multi-user.target

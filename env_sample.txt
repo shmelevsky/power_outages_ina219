@@ -1,0 +1,7 @@
+db_host="127.0.0.1"
+db_name=""
+db_user=""
+db_pass=""
+log_file="/var/lib/postgresql/logs/outages.log"
+telega_token=""
+telega_chat_id=""
