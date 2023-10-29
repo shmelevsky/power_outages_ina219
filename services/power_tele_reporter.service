@@ -1,5 +1,7 @@
 [Unit]
 Description=Power Telegram Reporter
+After=postgresql.service
+Wants=postgresql.service
 
 [Service]
 Type=simple
