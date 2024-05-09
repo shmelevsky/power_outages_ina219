@@ -5,6 +5,7 @@ config = Config()
 
 TOKEN = config.telega_token
 CHAT_ID = config.telega_chat_id
+MSG_THREAD_ID = config.message_thread_id
 
 
 class Error:
@@ -20,7 +21,7 @@ class Error:
 
 
 class TelegaMSGsender:
-    def __init__(self, token: str = TOKEN, chat_id: int = CHAT_ID, message_thread_id:int=16) -> None:
+    def __init__(self, token: str = TOKEN, chat_id: int = CHAT_ID, message_thread_id:int=MSG_THREAD_ID) -> None:
         """
         Initialize a TelegaMSGsender instance.
 
