@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 conn.cur.execute('SELECT * FROM  outages ORDER BY date DESC')
                 _, el, _ = conn.cur.fetchone()
             print(f"Rresult: {el}")
-            if el:
+            if not el:
                 if attempts >= 2:
                     print('do poweroff')
                     _, _  = run_cmd('/usr/sbin/poweroff')
