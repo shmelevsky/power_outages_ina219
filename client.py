@@ -2,6 +2,7 @@ from db import ConnectToDB
 from subprocess import Popen, PIPE, STDOUT
 from typing import Tuple, Optional
 from time import sleep
+from telega_msg_sender import TelegaMSGsender
 
 
 
@@ -20,6 +21,7 @@ def run_cmd(command, shell=False) -> Tuple[int, Optional[str]]:
 
 if __name__ == "__main__":
     attempts = 1
+    telega = TelegaMSGsender()
     while True:
         try:
             with ConnectToDB() as conn:
@@ -28,7 +30,7 @@ if __name__ == "__main__":
             print(f"Rresult: {el}")
             if not el:
                 if attempts >= 2:
-                    print('do poweroff')
+                    telega.send_msg('NAS POWERING OFF')
                     _, _  = run_cmd('/usr/sbin/poweroff')
                 attempts+=1
                 continue   
