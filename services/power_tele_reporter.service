@@ -7,6 +7,8 @@ Wants=postgresql.service
 Type=simple
 ExecStart=/root/power_outages_ina219/venv/bin/python3 /root/power_outages_ina219/power_tele_reporter.py
 EnvironmentFile=/root/power_outages_ina219/env.txt
+Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
