@@ -6,3 +6,4 @@ log_file="/var/lib/postgresql/logs/outages.log"
 telega_token=""
 telega_chat_id=""
 message_thread_id=1234
+device="ups_hut_b" # Default is "ina219"
