@@ -25,5 +25,12 @@ class INA219Interface:
             error = Error(err=f'unexpected error: {e}')
             return error, None
 
-
-
+    def get_current(self) -> Tuple[Optional[Error], Optional[int | float]]:
+        try:
+            return None, self.ina.current()
+        except DeprecationWarning as e:
+            # Current out of device range with specified shunt resistor
+            return Error(err=e), None
+        except Exception as e:
+            error = Error(err=f'unexpected error: {e}')
+            return error, None

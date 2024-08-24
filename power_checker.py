@@ -4,6 +4,10 @@ from time import sleep, time
 from logger import Logger
 from typing import Tuple, Optional
 import traceback
+from config import Config
+
+config = Config()
+DEVICE = config.device
 
 
 class PowerChecker(Logger):
@@ -19,6 +23,24 @@ class PowerChecker(Logger):
         2nd boolean, if it returns false, it means a power outage occurred.
         """
         ina219 = INA219Interface()
+
+        # Vaweshare UPS-HAT (B)
+        if DEVICE == 'ups_hut_b':
+            error, current = ina219.get_current()
+            if error:
+                self.logger(f'INA219. Error getting current state {error.error}')
+                return False, False
+            attempts = 0
+            while True:
+                if current < -320:
+                    if attempts >= 3:
+                        return True, False
+                    attempts += 1
+                    sleep(1)
+                    continue
+                else:
+                    return True, True
+        # The INA219 is connected in series with the UPS LX-2BUPS.
         error, power = ina219.get_power()
         if error:
             self.logger(f'INA219. Error getting power state {error.error}')
