@@ -22,7 +22,12 @@ class PowerChecker(Logger):
         1st boolean, if it returns false, it means the sensor didn't trigger, and a reattempt is needed.
         2nd boolean, if it returns false, it means a power outage occurred.
         """
-        ina219 = INA219Interface()
+        address = 0x40
+        busnum = 0
+        if DEVICE == 'ups_hut_b':
+            address = 0x42
+            busnum = 1
+        ina219 = INA219Interface(address=address, busnum=busnum)
 
         # Vaweshare UPS-HAT (B)
         if DEVICE == 'ups_hut_b':

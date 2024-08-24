@@ -10,9 +10,9 @@ class Error:
 
 
 class INA219Interface:
-    def __init__(self, busnum:int = 0) -> None:
+    def __init__(self, busnum:int = 0,address=0x40) -> None:
         SHUNT_OHMS = 0.1
-        self.ina = INA219(SHUNT_OHMS, busnum=busnum)
+        self.ina = INA219(SHUNT_OHMS, busnum=busnum, address=address)
         self.ina.configure()
 
     def get_power(self) -> Tuple[Optional[Error], Optional[int | float]]:
