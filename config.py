@@ -19,7 +19,7 @@ class Config:
             self.telega_chat_id: int = int(envir['telega_chat_id'])
             self.message_thread_id: int = int(envir['message_thread_id'])
             # Device
-            self.device: str = envir.get('deive', 'ina219')
+            self.device: str = envir.get('device', 'ina219')
         except Exception as err:
             print(f'You should define an environment variable: {err}')
             exit(1)
