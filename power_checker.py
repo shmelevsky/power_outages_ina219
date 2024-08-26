@@ -37,10 +37,10 @@ class PowerChecker(Logger):
             while True:
                 error, current = ina219.get_current()
                 if error:
-                    self.logger(f'INA219. Error getting current state {error.error}')
+                    self.log(f'INA219. Error getting current state {error.error}')
                     return False, False
                 if total_attempts == 100:
-                    self.logger(f'INA219. Seems current is flapping. More than 100 total attempts')
+                    self.log(f'INA219. Seems current is flapping. More than 100 total attempts')
                     return False, False
                 if current < -320:
                     if below_threshold_attempts >= 3:
@@ -57,7 +57,7 @@ class PowerChecker(Logger):
         # The INA219 is connected in series with the UPS LX-2BUPS.
         error, power = ina219.get_power()
         if error:
-            self.logger(f'INA219. Error getting power state {error.error}')
+            self.log(f'INA219. Error getting power state {error.error}')
             return False, False
         if power < 1:
             return True, False
