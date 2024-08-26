@@ -31,20 +31,29 @@ class PowerChecker(Logger):
 
         # Vaweshare UPS-HAT (B)
         if DEVICE == 'ups_hut_b':
-            error, current = ina219.get_current()
-            if error:
-                self.logger(f'INA219. Error getting current state {error.error}')
-                return False, False
-            attempts = 0
+            below_threshold_attempts = 0
+            above_threshold_attempts = 0
+            total_attempts = 0
             while True:
+                error, current = ina219.get_current()
+                if error:
+                    self.logger(f'INA219. Error getting current state {error.error}')
+                    return False, False
+                if total_attempts == 100:
+                    self.logger(f'INA219. Seems current is flapping. More than 100 total attempts')
+                    return False, False
                 if current < -320:
-                    if attempts >= 3:
+                    if below_threshold_attempts >= 3:
                         return True, False
-                    attempts += 1
-                    sleep(1)
-                    continue
+                    below_threshold_attempts += 1
+                    above_threshold_attempts = 0
                 else:
-                    return True, True
+                    if above_threshold_attempts >= 3:
+                        return True, True
+                    above_threshold_attempts += 1
+                    below_threshold_attempts = 0
+                total_attempts += 1
+                sleep(1)
         # The INA219 is connected in series with the UPS LX-2BUPS.
         error, power = ina219.get_power()
         if error:
