@@ -44,11 +44,13 @@ class PowerChecker(Logger):
                     return False, False
                 if current < -320:
                     if below_threshold_attempts >= 3:
+                        self.log(f'Detect power outage. Current: {current} mA')
                         return True, False
                     below_threshold_attempts += 1
                     above_threshold_attempts = 0
                 else:
                     if above_threshold_attempts >= 3:
+                        self.log(f'Electricity is back. Current: {current} mA')
                         return True, True
                     above_threshold_attempts += 1
                     below_threshold_attempts = 0
