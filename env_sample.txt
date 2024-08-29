@@ -7,3 +7,5 @@ telega_token=""
 telega_chat_id=""
 message_thread_id=1234
 device="ups_hut_b" # Default is "ina219"
+i2c_address = '0x42' # Default is '0x42'
+i2c_busnum = 1 # Default is 1

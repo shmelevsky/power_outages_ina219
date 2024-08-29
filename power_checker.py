@@ -8,7 +8,8 @@ from config import Config
 
 config = Config()
 DEVICE = config.device
-
+i2c_address = config.i2c_address
+i2c_busnum = config.i2c_busnum
 
 class PowerChecker(Logger):
     def __init__(self):
@@ -22,12 +23,7 @@ class PowerChecker(Logger):
         1st boolean, if it returns false, it means the sensor didn't trigger, and a reattempt is needed.
         2nd boolean, if it returns false, it means a power outage occurred.
         """
-        address = 0x40
-        busnum = 0
-        if DEVICE == 'ups_hut_b':
-            address = 0x42
-            busnum = 1
-        ina219 = INA219Interface(address=address, busnum=busnum)
+        ina219 = INA219Interface(address=i2c_address, busnum=i2c_busnum)
 
         # Vaweshare UPS-HAT (B)
         if DEVICE == 'ups_hut_b':
