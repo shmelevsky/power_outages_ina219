@@ -116,7 +116,7 @@ if __name__ == '__main__':
             continue
 
         if DEVICE == 'ups_hut_b':
-            unit = 'current'
+            unit = 'mA'
         else:
             unit = 'W'
 
