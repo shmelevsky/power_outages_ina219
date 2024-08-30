@@ -4,7 +4,12 @@ from time import sleep, time
 from logger import Logger
 from typing import Tuple, Optional
 import traceback
+from config import Config
 
+config = Config()
+DEVICE = config.device
+i2c_address = config.i2c_address
+i2c_busnum = config.i2c_busnum
 
 class PowerChecker(Logger):
     def __init__(self):
@@ -12,21 +17,57 @@ class PowerChecker(Logger):
         self.handler_name = 'PowerChecker'
         self.log('Starting PowerChecker')
 
-    def get_power_status(self) -> Tuple[bool, bool]:
+
+    def get_power_status(self) -> Tuple[bool, bool, Optional[int|float]]:
         """
-        it returns Tuple[boot, bool]
+        it returns Tuple[boot, bool, Optional[int|float]]
         1st boolean, if it returns false, it means the sensor didn't trigger, and a reattempt is needed.
         2nd boolean, if it returns false, it means a power outage occurred.
+        Optional[int|float] - cur current or power
         """
-        ina219 = INA219Interface()
+        ina219 = INA219Interface(address=i2c_address, busnum=i2c_busnum)
+        if DEVICE == 'ups_hut_b':
+            return self._check_ups_hut_b(ina219)
+        else:
+            return self._check_default_device(ina219)
+
+    def _check_ups_hut_b(self, ina219: INA219Interface) -> Tuple[bool, bool, Optional[int|float]]:
+        below_threshold_attempts = 0
+        above_threshold_attempts = 0
+        total_attempts = 0
+        while True:
+            error, current = ina219.get_current()
+            if error:
+                self.log(f'INA219. Error getting current state {error.error}')
+                return False, False, None
+            if total_attempts == 100:
+                self.log(f'INA219. Seems current is flapping. More than 100 total attempts')
+                return False, False, None
+            if current < -320:
+                if below_threshold_attempts >= 3:
+                    # self.log(f'Detect power outage. Current: {current} mA')
+                    return True, False, current
+                below_threshold_attempts += 1
+                above_threshold_attempts = 0
+            else:
+                if above_threshold_attempts >= 3:
+                    # self.log(f'Electricity is back. Current: {current} mA')
+                    return True, True, current
+                above_threshold_attempts += 1
+                below_threshold_attempts = 0
+            total_attempts += 1
+            sleep(1)
+
+    def _check_default_device(self, ina219: INA219Interface) -> Tuple[bool, bool, Optional[int|float]]:
+        # The INA219 is connected in series with the UPS LX-2BUPS.
         error, power = ina219.get_power()
         if error:
-            self.logger(f'INA219. Error getting power state {error.error}')
-            return False, False
+            self.log(f'INA219. Error getting power state {error.error}')
+            return False, False, None
         if power < 1:
-            return True, False
+            return True, False, power
         else:
-            return True, True
+            return True, True, power
 
     def get_last_status_from_db(self) -> Tuple[bool, Optional[bool]]:
         """
@@ -63,7 +104,7 @@ class PowerChecker(Logger):
 if __name__ == '__main__':
     power_checker = PowerChecker()
     while True:
-        ina219_work_status, power_status = power_checker.get_power_status()
+        ina219_work_status, power_status, current_or_power  = power_checker.get_power_status()
         # If the sensor failed to trigger for any reason, we skip the iteration.
         if not ina219_work_status:
             sleep(2)
@@ -74,7 +115,13 @@ if __name__ == '__main__':
             sleep(2)
             continue
 
+        if DEVICE == 'ups_hut_b':
+            unit = 'mA'
+        else:
+            unit = 'W'
+
         if (last_event is None) or (last_event != power_status):
+            power_checker.log(f'Power state is changed. Now {current_or_power} {unit}')
             power_checker.insert_result(power_status)
 
         sleep(1)
