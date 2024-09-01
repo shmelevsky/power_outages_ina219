@@ -132,9 +132,9 @@ if __name__ == '__main__':
             dt = reporter.convert_time(date)
             duration_formated = reporter.format_time(duration)
             if not event:
-                msg = f'\U0000274c {dt} Відсутнє електропостачання.\nТривалісь: {duration_formated}'
+                msg = f'\U0000274c {dt} Відсутнє електропостачання.\nЕлектроенергія була: {duration_formated}'
             else:
-                msg = f'\U00002705 {dt} Електропостачання відновлено!\nТривалісь: {duration_formated}'
+                msg = f'\U00002705 {dt} Електропостачання відновлено!\nТривалісь знеструмлення: {duration_formated}'
 
             result = reporter.send_msg(msg)
 
