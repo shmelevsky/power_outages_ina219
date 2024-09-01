@@ -130,7 +130,10 @@ if __name__ == '__main__':
         for ev in events:
             date, event, _, duration = ev
             dt = reporter.convert_time(date)
-            duration_formated = reporter.format_time(duration)
+            if duration:
+                duration_formated = reporter.format_time(duration)
+            else:
+                duration_formated = 'Не вдалося визначити'
             if not event:
                 msg = f'\U0000274c {dt} Відсутнє електропостачання.\nЕлектроенергія була: {duration_formated}'
             else:

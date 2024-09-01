@@ -109,7 +109,13 @@ if __name__ == '__main__':
         if not ina219_work_status:
             sleep(2)
             continue
-        db_status, date,last_event = power_checker.get_last_status_from_db()
+        try:
+            db_status, date,last_event = power_checker.get_last_status_from_db()
+        # probably no records in db. It whill be first
+        except TypeError:
+            duration = 0
+            power_checker.insert_result(power_status, duration)
+            continue
 
         if not db_status:
             sleep(2)
