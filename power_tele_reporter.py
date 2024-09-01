@@ -101,6 +101,21 @@ class PowerTeleReporter(Logger):
             self.log("================================================================")
             return False
 
+    @staticmethod
+    def format_time(seconds:int):
+        if seconds < 3600:  # Less than an hour
+            minutes = seconds // 60
+            return f"{minutes} min"
+        elif seconds < 86400:  # Less than a day
+            hours = seconds // 3600
+            minutes = (seconds % 3600) // 60
+            return f"{hours} hr {minutes} min"
+        else:  # More than a day
+            days = seconds // 86400
+            hours = (seconds % 86400) // 3600
+            minutes = (seconds % 3600) // 60
+            return f"{days} d {hours} hr {minutes} min"
+
 
 if __name__ == '__main__':
     reporter = PowerTeleReporter()
@@ -113,12 +128,13 @@ if __name__ == '__main__':
             continue
 
         for ev in events:
-            date, event, _ = ev
+            date, event, _, duration = ev
             dt = reporter.convert_time(date)
+            duration_formated = reporter.format_time(duration)
             if not event:
-                msg = f'\U0000274c {dt} Тільки кавки хотів зварить'
+                msg = f'\U0000274c {dt} Відсутнє електропостачання.\nТривалісь: {duration_formated}'
             else:
-                msg = f'\U00002705 {dt} Да буде світло'
+                msg = f'\U00002705 {dt} Електропостачання відновлено!\nТривалісь: {duration_formated}'
 
             result = reporter.send_msg(msg)
 
