@@ -26,7 +26,7 @@ if __name__ == "__main__":
         try:
             with ConnectToDB() as conn:
                 conn.cur.execute('SELECT * FROM  outages ORDER BY date DESC')
-                _, el, _ = conn.cur.fetchone()
+                _, el, _, _ = conn.cur.fetchone()
             print(f"Rresult: {el}")
             if not el:
                 if attempts >= 2:
