@@ -30,10 +30,11 @@ pip install -r requirements
 create user checker with encrypted password 'password';
 create database outages;
 grant ALL ON DATABASE outages TO checker;
+ALTER DATABASE outages OWNER TO checker;
 \c outages
-CREATE TABLE outages (date int, event BOOLEAN, sent BOOLEAN default false);
+CREATE TABLE outages (date int, event BOOLEAN, sent BOOLEAN default false, duration int);
 CREATE INDEX index_date ON outages(date);
-
+ALTER TABLE outages owner to checker ;
 ```
 #### Config
 

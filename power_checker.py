@@ -69,7 +69,7 @@ class PowerChecker(Logger):
         else:
             return True, True, power
 
-    def get_last_status_from_db(self) -> Tuple[bool, Optional[bool]]:
+    def get_last_status_from_db(self) -> Tuple[bool, Optional[bool], Optional[int]]:
         """
         It returns two booleans.
         The first boolean, if false, means it couldn't retrieve data from the database; the database does not work.
@@ -78,20 +78,20 @@ class PowerChecker(Logger):
         try:
             with ConnectToDB() as conn:
                 conn.cur.execute('SELECT * FROM  outages ORDER BY date DESC')
-                _, event, _ = conn.cur.fetchone()
-                return True, event
+                date_time, event, _, _ = conn.cur.fetchone()
+                return True, date_time, event
 
         except Exception as err:
             self.log(f'DataBase. Error getting data from database {err}')
             self.log("=======================TraceBack================================")
             self.log(traceback.format_exc())
             self.log("================================================================")
-            return False, None
+            return False, None, None
 
-    def insert_result(self, event: bool) -> None:
+    def insert_result(self, event: bool, event_duration:int) -> None:
         try:
             with ConnectToDB() as conn:
-                sql = "INSERT INTO outages VALUES ({},{},{})".format(int(time()), event, False)
+                sql = "INSERT INTO outages VALUES ({},{},{},{})".format(int(time()), event, False, event_duration)
                 conn.cur.execute(sql)
                 conn.db.commit()
         except Exception as err:
@@ -109,7 +109,13 @@ if __name__ == '__main__':
         if not ina219_work_status:
             sleep(2)
             continue
-        db_status, last_event = power_checker.get_last_status_from_db()
+        try:
+            db_status, date,last_event = power_checker.get_last_status_from_db()
+        # probably no records in db. It whill be first
+        except TypeError:
+            duration = 0
+            power_checker.insert_result(power_status, duration)
+            continue
 
         if not db_status:
             sleep(2)
@@ -122,6 +128,6 @@ if __name__ == '__main__':
 
         if (last_event is None) or (last_event != power_status):
             power_checker.log(f'Power state is changed. Now {current_or_power} {unit}')
-            power_checker.insert_result(power_status)
-
+            duration = int(time()) - date
+            power_checker.insert_result(power_status, duration)
         sleep(1)
